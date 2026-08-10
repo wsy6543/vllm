@@ -36,3 +36,5 @@ share/python-wheels/
 *.egg
 MANIFEST
 rust/target/
+.omc
+tmp
