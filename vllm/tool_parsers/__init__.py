@@ -146,6 +146,10 @@ _TOOL_PARSERS_TO_REGISTER = {
         "mistral_tool_parser",
         "MistralToolParser",
     ),
+    "my_model": (
+        "my_model_tool_parser",
+        "MyModelToolParser",
+    ),
     "olmo3": (
         "olmo3_tool_parser",
         "Olmo3PythonicToolParser",

@@ -39,6 +39,7 @@ def main():
     cli_env_setup()
 
     # If `--omni` arg is passed to the CLI, delegate to vLLM Omni's entrypoint handling
+    # 开启多模态能力
     if "--omni" in sys.argv:
         # NOTE: Check the spec instead of importing directly here, since things could
         # fail with ImportError due to mismatched versions if things are moved around.

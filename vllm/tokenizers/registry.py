@@ -45,6 +45,8 @@ _VLLM_TOKENIZERS = {
     "cohere": ("hf", "CachedHfTokenizer"),
     "deepseek_v32": ("deepseek_v32", "DeepseekV32Tokenizer"),
     "deepseek_v4": ("deepseek_v4", "DeepseekV4Tokenizer"),
+    # Demo mode for learning how to plug in a custom tokenizer.
+    "demo": ("demo_tokenizer", "DemoTokenizer"),
     "hf": ("hf", "CachedHfTokenizer"),
     "kimi_audio": ("kimi_audio", "KimiAudioTokenizer"),
     "kimi_k3": ("hf", "CachedHfTokenizer"),
