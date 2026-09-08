@@ -203,7 +203,7 @@ class AsyncLLM(EngineClient):
             self.profiler = None
 
     @classmethod
-    def from_vllm_config(
+    def from_vllm_config(              # 创建入口
         cls,
         vllm_config: VllmConfig,
         start_engine_loop: bool = True,

@@ -1001,6 +1001,7 @@ class EngineShutdownState(IntEnum):
     SHUTTING_DOWN = 2
 
 
+# 后台进程
 class EngineCoreProc(EngineCore):
     """ZMQ-wrapper for running EngineCore in background process."""
 
