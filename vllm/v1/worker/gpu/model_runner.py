@@ -1202,6 +1202,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             sampler_output = self.sampler(logits, input_batch)
         else:
             # Rejection sampling for spec decoding.
+            # 有投机解码，进行投机解码采样
             assert self.rejection_sampler is not None
             assert self.speculator is not None
             sampler_output = self.rejection_sampler(

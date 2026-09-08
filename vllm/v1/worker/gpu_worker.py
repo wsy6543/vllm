@@ -407,6 +407,7 @@ class Worker(WorkerBase):
         init_workspace_manager(self.device, num_ubatches)
 
         # Construct the model runner
+        # 看v2就好了
         if self.use_v2_model_runner:
             from vllm.v1.worker.gpu.model_runner import (
                 GPUModelRunner as GPUModelRunnerV2,

@@ -228,10 +228,10 @@ class OpenAIServingChat(GenerateBaseServing):
         for the API specification. This API mimics the OpenAI
         Chat Completion API.
         """
-        return await self._with_kv_transfer_rejection_cleanup(
+        return await self._with_kv_transfer_rejection_cleanup(  # _with_kv_transfer_rejection_cleanup 这个就是一个try catch 失败了清理kvchache
             self._create_chat_completion(request, raw_request), request, raw_request
         )
-
+    # 核心链路
     async def _create_chat_completion(
         self,
         request: ChatCompletionRequest,
@@ -249,7 +249,7 @@ class OpenAIServingChat(GenerateBaseServing):
                 chat_template_kwargs=chat_template_kwargs,
                 model_config=self.model_config,
             )
-        result = await self.render_chat_request(request)
+        result = await self.render_chat_request(request)  # 格式化请求
         if isinstance(result, ErrorResponse):
             return result
 

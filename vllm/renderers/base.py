@@ -420,6 +420,7 @@ class BaseRenderer(ABC, Generic[_T]):
     ) -> tuple[list["ConversationMessage"], DictPrompt]:
         raise NotImplementedError
 
+    # 一帮都是走HFrender这个实现
     async def render_messages_async(
         self,
         messages: list["ChatCompletionMessageParam"],

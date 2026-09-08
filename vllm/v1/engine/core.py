@@ -228,6 +228,7 @@ class EngineCore:
                 hash_block_size, caching_hash_fn
             )
 
+        # 一般都走step，只有批量的时候走step_with_batch_queue
         self.step_fn = (
             self.step if self.batch_queue is None else self.step_with_batch_queue
         )
@@ -472,6 +473,7 @@ class EngineCore:
                 "Disabling ECTransfer for this request."
             )
 
+        # 走到scheduler的add_request
         self.scheduler.add_request(request)
         if request.abort_immediately:
             # Immediately abort so the connector's request_finished hook runs
@@ -577,6 +579,7 @@ class EngineCore:
         Overridden by the DP engine core; never throttles otherwise."""
         return False
 
+    # 关键方法
     def step(self) -> tuple[dict[int, EngineCoreOutputs], bool]:
         """Schedule, execute, and make output.
 
@@ -588,7 +591,9 @@ class EngineCore:
         # or finished and not yet removed from the batch.
         if not self.scheduler.has_requests():
             return {}, False
+        # 先执行scheduler.schedule的方法，返回一个执行计划，要跑几个token，分配几个block
         scheduler_output = self.scheduler.schedule(self._should_throttle_prefills())
+        # model_executor 一般是哪个？单卡uni，多卡mp，配置ray的话用ray，一般是mp。
         future = self.model_executor.execute_model(scheduler_output, non_block=True)
         grammar_output = self.scheduler.get_grammar_bitmask(scheduler_output)
         with (
@@ -597,6 +602,7 @@ class EngineCore:
         ):
             model_output = future.result()
             if model_output is None:
+                # 执行sample_tokens选取token
                 model_output = self.model_executor.sample_tokens(grammar_output)
 
         # Before processing the model output, process any aborts that happened
@@ -613,9 +619,12 @@ class EngineCore:
         # When using async scheduling we can't get draft token ids in advance,
         # so we update draft token ids in the worker process and don't
         # need to update draft token ids here.
+        # 只有开启投机解码才有这个操作
         if self.check_for_draft_tokens and not self.async_scheduling and model_executed:
+            # 获取draft token ids
             draft_token_ids = self.model_executor.take_draft_token_ids()
             if draft_token_ids is not None:
+                # 把draft token ids 放到request上，在下个流程scheduler.scheduler时进行采纳
                 self.scheduler.update_draft_token_ids(draft_token_ids)
 
     def step_with_batch_queue(
@@ -1001,6 +1010,7 @@ class EngineShutdownState(IntEnum):
     SHUTTING_DOWN = 2
 
 
+# 后台进程
 class EngineCoreProc(EngineCore):
     """ZMQ-wrapper for running EngineCore in background process."""
 
@@ -1371,12 +1381,14 @@ class EngineCoreProc(EngineCore):
     @fault_tolerant_wrapper
     def run_busy_loop(self):
         """Core busy loop of the EngineCore."""
+        # 监听mq消息
         while self._handle_shutdown():
             # 1) Poll the input queue until there is work to do.
             self._process_input_queue()
             # Publish request counts before and after GPU step to ensure freshness.
             self._maybe_publish_request_counts()
             # 2) Step the engine core and return the outputs.
+            # 核心步骤
             self._process_engine_step()
             self._maybe_publish_request_counts()
 

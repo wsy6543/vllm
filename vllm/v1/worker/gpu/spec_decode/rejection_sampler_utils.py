@@ -1185,4 +1185,5 @@ def rejection_sample(
         temperature,
         PADDED_RESAMPLE_NUM_BLOCKS=padded_resample_num_blocks,
     )
-    return sampled, num_sampled
+    return sampled, num_sampled     # 接受的token列表，接受的token数量
+

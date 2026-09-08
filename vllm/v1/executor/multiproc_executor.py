@@ -173,6 +173,7 @@ class MultiprocExecutor(Executor):
 
             # For CPU backend only, to setup OpenMP threads affinity
             cpu_omp_manager = OMPProcessManager(self.vllm_config)
+            # 启动多个worker
             for local_rank in range(self.local_world_size):
                 global_rank = global_start_rank + local_rank
                 is_driver_worker = self._is_driver_worker(global_rank)

@@ -180,7 +180,7 @@ class OnlineRenderer:
             tool_dicts = [tool.model_dump() for tool in request.tools]
 
         if not self.use_harmony:
-            # Common case.
+            # Common case.（一般走这个分支）
             error_check_ret = self.validate_chat_template(
                 request_chat_template=request.chat_template,
                 chat_template_kwargs=request.chat_template_kwargs,
@@ -423,6 +423,7 @@ class OnlineRenderer:
                 reuse_ids, cache_salt=getattr(request, "cache_salt", None)
             )
         else:
+            # 一般走这个分支
             (conversation,), (engine_input,) = await renderer.render_chat_async(
                 [messages],
                 chat_params,

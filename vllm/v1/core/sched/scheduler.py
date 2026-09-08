@@ -435,6 +435,7 @@ class Scheduler(SchedulerInterface):
         )
         return blocks, num_local, shared_prefix_boundary, False
 
+    # 核心调度方法
     def schedule(self, throttle_prefills: bool = False) -> SchedulerOutput:
         self.current_step += 1
         # NOTE(woosuk) on the scheduling algorithm:
@@ -644,8 +645,9 @@ class Scheduler(SchedulerInterface):
             token_budget -= num_new_tokens
             req_index += 1
 
-            # Speculative decode related.
+            # Speculative decode related.（投机解码分支）
             if request.spec_token_ids:
+                # 本轮最多可以调度多少token
                 num_scheduled_spec_tokens = (
                     num_new_tokens
                     + request.num_computed_tokens
@@ -656,6 +658,7 @@ class Scheduler(SchedulerInterface):
                     spec_token_ids = request.spec_token_ids
                     if len(spec_token_ids) > num_scheduled_spec_tokens:
                         spec_token_ids = spec_token_ids[:num_scheduled_spec_tokens]
+                    # 这个会在output的时候进行验证
                     scheduled_spec_decode_tokens[request.request_id] = spec_token_ids
 
                 # New spec tokens will be set in `update_draft_token_ids` before the

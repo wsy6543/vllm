@@ -77,6 +77,7 @@ from .utils import (
 )
 
 
+# 前馈网络层
 class LlamaMLP(nn.Module):
     def __init__(
         self,
@@ -98,6 +99,7 @@ class LlamaMLP(nn.Module):
             disable_tp=disable_tp,
             prefix=f"{prefix}.gate_up_proj",
         )
+        # Linear(hidden, intermediate) 等价
         self.down_proj = RowParallelLinear(
             input_size=intermediate_size,
             output_size=hidden_size,
@@ -119,7 +121,7 @@ class LlamaMLP(nn.Module):
         x, _ = self.down_proj(x)
         return x
 
-
+# 自主力层
 class LlamaAttention(nn.Module):
     def __init__(
         self,
@@ -155,11 +157,14 @@ class LlamaAttention(nn.Module):
 
         head_dim = getattr(config, "head_dim", None)
         self.head_dim = head_dim or self.hidden_size // self.total_num_heads
+        # qkv的长度
         self.q_size = self.num_heads * self.head_dim
         self.kv_size = self.num_kv_heads * self.head_dim
+        # 缩放因子
         self.scaling = self.head_dim**-0.5
+        # PoPE最大位置长度
         self.max_position_embeddings = max_position_embeddings
-
+        # qkv合并一个大矩阵，方便计算
         self.qkv_proj = QKVParallelLinear(
             hidden_size=hidden_size,
             head_size=self.head_dim,
@@ -169,7 +174,7 @@ class LlamaAttention(nn.Module):
             quant_config=quant_config,
             prefix=f"{prefix}.qkv_proj",
         )
-
+        # 输出投影
         self.o_proj = RowParallelLinear(
             input_size=self.total_num_heads * self.head_dim,
             output_size=hidden_size,
@@ -177,7 +182,7 @@ class LlamaAttention(nn.Module):
             quant_config=quant_config,
             prefix=f"{prefix}.o_proj",
         )
-
+        # 位置编码
         self._init_rotary_emb(config, quant_config=quant_config)
 
         sliding_window = None
@@ -483,6 +488,7 @@ class LlamaForCausalLM(
         )
 
         if get_pp_group().is_last_rank:
+            # 只有PP最后一层才需要用到
             self.lm_head = ParallelLMHead(
                 config.vocab_size,
                 config.hidden_size,
@@ -497,6 +503,7 @@ class LlamaForCausalLM(
                 config.vocab_size, scale=logit_scale
             )
         else:
+            # 占位置
             self.lm_head = PPMissingLayer()
 
         self.make_empty_intermediate_tensors = (

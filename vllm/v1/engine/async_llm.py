@@ -203,7 +203,7 @@ class AsyncLLM(EngineClient):
             self.profiler = None
 
     @classmethod
-    def from_vllm_config(
+    def from_vllm_config(              # 创建入口
         cls,
         vllm_config: VllmConfig,
         start_engine_loop: bool = True,
@@ -401,8 +401,7 @@ class AsyncLLM(EngineClient):
 
         # Use cloned params that may have been updated in process_inputs()
         params = request.params
-
-        if is_pooling or params.n == 1:
+        if is_pooling or params.n == 1: # 一帮走这个
             await self._add_request(request, prompt_text, None, 0, queue)
             return queue
 
@@ -547,7 +546,7 @@ class AsyncLLM(EngineClient):
     # requests we don't need to send multiple messages to core proc,
     # and so we don't need multiple streams which then get
     # re-multiplexed in the API server anyhow.
-    async def generate(
+    async def generate(      # 所有请求的核心入口
         self,
         prompt: EngineCoreRequest
         | PromptType

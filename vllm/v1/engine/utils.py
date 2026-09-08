@@ -1066,6 +1066,7 @@ class CoreEngineLaunch:
     watched_frontend_processes: Sequence[FrontendProcess] = ()
 
 
+# 核心函数
 @contextlib.contextmanager
 def launch_core_engines(
     vllm_config: VllmConfig,

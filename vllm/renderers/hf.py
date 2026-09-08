@@ -1060,6 +1060,7 @@ class HfRenderer(BaseRenderer[HfTokenizer]):
                 _ensure_prompt_embeds_placeholder_token(tokenizer)
             )
 
+        # mm_data 就是多模态的数据MultiModalDataDict
         conversation, mm_data, mm_uuids = await parse_chat_messages_async(
             messages,
             model_config,

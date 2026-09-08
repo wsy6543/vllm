@@ -335,7 +335,7 @@ class LLM(BeamSearchOfflineMixin, PoolingOfflineMixin, OfflineInferenceMixin):
         )
 
         log_non_default_args(engine_args)
-
+        # 创建引擎，初始化各种配置
         self.llm_engine = LLMEngine.from_engine_args(
             engine_args=engine_args, usage_context=UsageContext.LLM_CLASS
         )
